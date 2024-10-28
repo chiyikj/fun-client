@@ -127,17 +127,22 @@ class client {
   }
 
   public async request<T>(methodName: string, dto: any[], on?: on<T>) {
+    const after = (result: result<T>): result<T> => {
+      return this.afterCall ? this.afterCall (result, methodName) : result
+    }
     await new Promise ((resolve) => {
-      while (this.status !== status.no) {
+      let status1 = false
+      const timeoutFunc = setTimeout (() => {
+        status1 = true
+      }, 2000)
+      while (this.status !== status.no || status1) {
+        clearTimeout(timeoutFunc)
         resolve (null)
       }
     })
     const id: string = crypto.randomUUID ();
     const state = new Map<string, any> ();
     this.formerCall && this.formerCall (methodName, state);
-    const after = (result: result<T>): result<T> => {
-      return this.afterCall ? this.afterCall (result, methodName) : result
-    }
     const request: request = {
       id,
       methodName,

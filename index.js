@@ -95,17 +95,22 @@ class client {
         this.worker.port.start();
     }
     async request(methodName, dto, on) {
+        const after = (result) => {
+            return this.afterCall ? this.afterCall(result, methodName) : result;
+        };
         await new Promise((resolve) => {
-            while (this.status !== status.no) {
+            let status1 = false;
+            const timeoutFunc = setTimeout(() => {
+                status1 = true;
+            }, 2000);
+            while (this.status !== status.no || status1) {
+                clearTimeout(timeoutFunc);
                 resolve(null);
             }
         });
         const id = crypto.randomUUID();
         const state = new Map();
         this.formerCall && this.formerCall(methodName, state);
-        const after = (result) => {
-            return this.afterCall ? this.afterCall(result, methodName) : result;
-        };
         const request = {
             id,
             methodName,
