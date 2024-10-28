@@ -135,10 +135,13 @@ class client {
       const timeoutFunc = setTimeout (() => {
         status1 = true
       }, 2000)
-      while (this.status !== status.no || status1) {
-        clearTimeout(timeoutFunc)
-        resolve (null)
-      }
+      const interval = setInterval(() => {
+        if (this.status !== status.no || status1) {
+          clearTimeout(timeoutFunc)
+          clearInterval(interval);
+          resolve(null);
+        }
+      }, 100);
     })
     const id: string = crypto.randomUUID ();
     const state = new Map<string, any> ();
@@ -150,7 +153,7 @@ class client {
       dto,
     }
     if (on) {
-      if (this.status == status.close) {
+      if (this.status !== status.susses) {
         on.onError (after ({
           Status: resultStatus.networkError
         }))
@@ -176,7 +179,7 @@ class client {
         const func = (data: result<T>) => {
           resolve (after (data));
         }
-        if (this.status == status.close) {
+        if (this.status !== status.susses) {
           func ({
             Status: resultStatus.networkError
           })
