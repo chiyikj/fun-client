@@ -62,6 +62,8 @@ class client {
                 case workerDataType.data:
                     let result = JSON.parse(data.data);
                     const index = that.requestList.findIndex((request) => request.id === result.Id);
+                    if (index == -1)
+                        break;
                     const request = that.requestList[index];
                     if (request.methodType === methodType.function) {
                         request.func && request.func(result);
