@@ -73,7 +73,7 @@ class client {
   private openCall: (() => void)[] = [];
   private closeCall: (() => void)[] = [];
   constructor(url: string) {
-    this.worker = new SharedWorker (new URL ('./wsWorker', import.meta.url) + "?url=" + url + "&id=" + getId ());
+    this.worker = new SharedWorker (new URL ('./worker', import.meta.url) + "?url=" + url + "&id=" + getId ());
     const that = this;
     this.worker.port.onmessage = function (e) {
       let data:workerType = JSON.parse (e.data);

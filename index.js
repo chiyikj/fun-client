@@ -41,7 +41,7 @@ class client {
         this.afterCall = null;
         this.openCall = [];
         this.closeCall = [];
-        this.worker = new SharedWorker(new URL('./wsWorker', import.meta.url) + "?url=" + url + "&id=" + getId());
+        this.worker = new SharedWorker(new URL('./worker', import.meta.url) + "?url=" + url + "&id=" + getId());
         const that = this;
         this.worker.port.onmessage = function (e) {
             let data = JSON.parse(e.data);
