@@ -16,6 +16,7 @@ self.onconnect = (e) => {
             }))
         }
     }
+    clientList.push(port)
     //监听消息
     port.onmessage = (e) => {
         const data = JSON.parse(e.data);
@@ -31,7 +32,7 @@ self.onconnect = (e) => {
                 port,
             })
         }
-        ws.send(data)
+        ws.send(JSON.stringify(data))
     };
     port.start();
 };
@@ -47,7 +48,7 @@ function newWs(port) {
     let time = null;
     ws.onopen = function () {
         clientList.forEach((port) => {
-            port.port.postMessage(JSON.stringify({
+            port.postMessage(JSON.stringify({
                 type: 0
             }))
         })
@@ -64,15 +65,16 @@ function newWs(port) {
     };
 
     ws.onmessage = function (evt) {
-        if (evt.data === "pong") {
+        const data = JSON.parse (evt.data);
+        if (data.Data === "pong") {
             clearTimeout(time)
         } else {
-            const index = requestList.findIndex((request) => request.request.id === evt.data.Id)
+            const index = requestList.findIndex((request) => request.request.id === data.Id)
             const request = requestList[index]
-            if (request.request.methodType === 0 || evt.data.Status === 3) {
+            if (request.request.methodType === 0 || data.Status === 3) {
                 requestList.splice(index, 1);
             }
-            request.port.postMessage({type: 2, data: JSON.stringify(evt.data)})
+            request.port.postMessage(JSON.stringify({type: 2, data: JSON.stringify(data)}))
         }
     };
 

@@ -92,7 +92,7 @@ class client {
           })
           break
         case workerDataType.data:
-          let result:result<any> = data.data;
+          let result:result<any> = JSON.parse(data.data);
           const index = that.requestList.findIndex((request) => request.id === result.Id)
           const request:request = that.requestList[index]
           if (request.methodType === methodType.function) {
@@ -126,7 +126,8 @@ class client {
 
   }
 
-  public async request<T>(methodName: string, dto: any[], on?: on<T>) {
+  public async request<T>(methodName: string, argumentsList: any[] | null, on?: on<T>) {
+    const dto = argumentsList || []
     const after = (result: result<T>): result<T> => {
       return this.afterCall ? this.afterCall (result, methodName) : result
     }
