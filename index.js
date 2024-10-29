@@ -149,6 +149,7 @@ class client {
             }
             else {
                 const func = (data) => {
+                    delete data.Id;
                     resolve(after(data));
                 };
                 if (this.status !== status.susses) {
