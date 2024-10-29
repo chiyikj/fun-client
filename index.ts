@@ -180,6 +180,20 @@ class client {
       } else {
         const func = (data: result<T>) => {
           delete data.Id
+          switch (data.Status) {
+            case resultStatus.success:
+              delete data.Code
+              break
+            case resultStatus.callError:
+              data.Msg = data.Data as string
+              delete data.Data
+              delete data.Code
+              break
+            case resultStatus.error:
+              data.Msg = data.Data as string
+              delete data.Data
+              break
+          }
           resolve (after (data));
         }
         if (this.status !== status.susses) {

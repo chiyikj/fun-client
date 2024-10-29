@@ -150,6 +150,20 @@ class client {
             else {
                 const func = (data) => {
                     delete data.Id;
+                    switch (data.Status) {
+                        case resultStatus.success:
+                            delete data.Code;
+                            break;
+                        case resultStatus.callError:
+                            data.Msg = data.Data;
+                            delete data.Data;
+                            delete data.Code;
+                            break;
+                        case resultStatus.error:
+                            data.Msg = data.Data;
+                            delete data.Data;
+                            break;
+                    }
                     resolve(after(data));
                 };
                 if (this.status !== status.susses) {
