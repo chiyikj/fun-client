@@ -103,8 +103,7 @@ class client {
         });
         this.worker.port.start();
     }
-    async request(methodName, argumentsList, on) {
-        const dto = argumentsList || [];
+    async request(methodName, dto, on) {
         const after = (result) => {
             return this.afterCall ? this.afterCall(result, methodName) : result;
         };

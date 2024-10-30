@@ -30,7 +30,7 @@ declare class client {
     private openCall;
     private closeCall;
     constructor(url: string);
-    request<T>(methodName: string, argumentsList: any[] | null, on?: on<T>): Promise<result<T> | (() => void)>;
+    request<T>(methodName: string, dto: Object | null, on?: on<T>): Promise<result<T> | (() => void)>;
     onFormer(func: (methodName: string, state: Map<string, any>) => void): void;
     onAfter(func: (result: result<any>, methodName: string) => result<any>): void;
     onClose(func: () => void): void;
