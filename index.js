@@ -1,8 +1,8 @@
 var resultStatus;
 (function (resultStatus) {
     resultStatus[resultStatus["success"] = 0] = "success";
-    resultStatus[resultStatus["error"] = 1] = "error";
-    resultStatus[resultStatus["callError"] = 2] = "callError";
+    resultStatus[resultStatus["callError"] = 1] = "callError";
+    resultStatus[resultStatus["error"] = 2] = "error";
     resultStatus[resultStatus["closeError"] = 3] = "closeError";
     resultStatus[resultStatus["networkError"] = 4] = "networkError";
 })(resultStatus || (resultStatus = {}));

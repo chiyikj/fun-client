@@ -11,8 +11,8 @@ interface request {
 
 enum resultStatus {
   success,
-  error,
   callError,
+  error,
   closeError,
   networkError
 }

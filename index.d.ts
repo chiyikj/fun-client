@@ -1,7 +1,7 @@
 declare enum resultStatus {
     success = 0,
-    error = 1,
-    callError = 2,
+    callError = 1,
+    error = 2,
     closeError = 3,
     networkError = 4
 }
