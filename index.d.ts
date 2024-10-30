@@ -3,8 +3,7 @@ declare enum resultStatus {
     error = 1,
     callError = 2,
     closeError = 3,
-    networkError = 4,
-    timeoutError = 5
+    networkError = 4
 }
 interface result<T> {
     Id?: string | null;

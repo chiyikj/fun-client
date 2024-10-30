@@ -5,7 +5,6 @@ interface request {
   state: Map<string, any>
   methodType?: methodType
   func?: (data: result<any>) => void
-  timeoutFunc?: () => void
   on?: on<any>
 
 }
@@ -15,8 +14,7 @@ enum resultStatus {
   error,
   callError,
   closeError,
-  networkError,
-  timeoutError
+  networkError
 }
 
 interface result<T> {
@@ -86,6 +84,13 @@ class client {
           break
         case workerDataType.close:
           that.status = status.close
+          that.requestList.forEach((request)=>{
+            if (request.methodType === methodType.function) {
+              request.func && request.func({Status: resultStatus.closeError})
+            } else {
+              request.on?.onClose()
+            }
+          })
           that.requestList.length = 0
           that.closeCall.forEach ((closeCall) => {
             closeCall ()
@@ -203,14 +208,6 @@ class client {
         }
         request.methodType = methodType.function
         this.worker?.port.postMessage (JSON.stringify (request));
-        const timeoutFunc = setTimeout (() => {
-          func ({
-            Status: resultStatus.timeoutError
-          })
-        }, 10000)
-        request.timeoutFunc = () => {
-          clearTimeout (timeoutFunc)
-        }
         request.func = func
         this.requestList.push (request);
       }
