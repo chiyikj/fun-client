@@ -1,7 +1,7 @@
 interface request {
   id: string
   methodName: string
-  dto: any
+  dto: Object | null
   state: Map<string, any>
   methodType?: methodType
   func?: (data: result<any>) => void
@@ -132,8 +132,7 @@ class client {
 
   }
 
-  public async request<T>(methodName: string, argumentsList: any[] | null, on?: on<T>) {
-    const dto = argumentsList || []
+  public async request<T>(methodName: string, dto: Object | null, on?: on<T>) {
     const after = (result: result<T>): result<T> => {
       return this.afterCall ? this.afterCall (result, methodName) : result
     }
