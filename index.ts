@@ -38,7 +38,7 @@ interface requestInfo<T> {
     methodName: string
     serviceName: string
     dto?: T | undefined
-    state: Map<string, any>
+    state: Map<string, string>
     type: requestType
     func?: (data: result<any>) => void
     on?: on<any>
@@ -64,7 +64,7 @@ export default class client {
     private worker: globalThis.MessagePort | Worker | null = null;
     private status: status = status.close;
     private requestList: requestInfo<any>[] = [];
-    private formerCall: ((serviceName: string ,methodName: string, state: Map<string, any>) => void) | null = null;
+    private formerCall: ((serviceName: string ,methodName: string, state: Map<string, string>) => void) | null = null;
     private afterCall: (( serviceName: string ,methodName: string,result: result<any>) => result<any>) | null = null;
     private openCall: (() => void)[] = [];
     private closeCall: (() => void)[] = [];
@@ -72,8 +72,8 @@ export default class client {
     constructor(url: string) {
         this.worker = getWorker(url)
         const that = this;
-        this.worker.onmessage = function (e) {
-            const data: workerType = JSON.parse (e.data);
+        this.worker.onmessage = function (this: MessagePort, ev: MessageEvent) {
+            const data: workerType = JSON.parse (ev.data);
             that.getMessage(data)
         }
         if (this.worker instanceof MessagePort) {
@@ -229,7 +229,7 @@ export default class client {
     }
 
 
-    public async onFormer(func: (serviceName: string, methodName: string, state: Map<string, any>) => void) {
+    public onFormer(func: (serviceName: string, methodName: string, state: Map<string, string>) => void) {
         this.formerCall = func
     }
 
