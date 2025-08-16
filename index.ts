@@ -93,7 +93,7 @@ export default class client {
         this.worker instanceof MessagePort && this.worker.start ()
     }
 
-    public getMessage(data: workerType) {
+    private getMessage(data: workerType) {
         const that = this;
         switch (data.type) {
             case workerDataType.open:
@@ -152,9 +152,9 @@ export default class client {
         return this.afterCall ? this.afterCall (serviceName, methodName, result) : result
     }
 
-    protected async request<T>(serviceName: string, methodName: string, dto?: object | null): Promise<result<T>>;
-    protected async request<T>(serviceName: string, methodName: string, dto: object | null, on: on<T>): Promise<(() => void)>;
-    protected async request<T>(serviceName: string, methodName: string, dto: object | null = null, on?: on<T>): Promise<result<T> | (() => void)> {
+    public async request<T>(serviceName: string, methodName: string, dto?: object | null): Promise<result<T>>;
+    public async request<T>(serviceName: string, methodName: string, dto: object | null, on: on<T>): Promise<(() => void)>;
+    public async request<T>(serviceName: string, methodName: string, dto: object | null = null, on?: on<T>): Promise<result<T> | (() => void)> {
         return new Promise<result<T> | (()=>void)>((resolve, reject) => {
             const id: string = nanoid ();
             const state = new Map<string, any> ();
