@@ -152,9 +152,9 @@ export default class client {
         return this.afterCall ? this.afterCall (serviceName, methodName, result) : result
     }
 
-    public async request<T>(serviceName: string, methodName: string, dto?: object | null): Promise<result<T>>;
-    public async request<T>(serviceName: string, methodName: string, dto: object | null, on: on<T>): Promise<(() => void)>;
-    public async request<T>(serviceName: string, methodName: string, dto: object | null = null, on?: on<T>): Promise<result<T> | (() => void)> {
+    protected async request<T>(serviceName: string, methodName: string, dto?: object | null): Promise<result<T>>;
+    protected async request<T>(serviceName: string, methodName: string, dto: object | null, on: on<T>): Promise<(() => void)>;
+    protected async request<T>(serviceName: string, methodName: string, dto: object | null = null, on?: on<T>): Promise<result<T> | (() => void)> {
         return new Promise<result<T> | (()=>void)>((resolve, reject) => {
             const id: string = nanoid ();
             const state = new Map<string, any> ();
@@ -216,13 +216,13 @@ export default class client {
         })
     }
 
-    public deleteRequest(id: string) {
+    private deleteRequest(id: string) {
         this.requestList = this.requestList.filter ((requestInfo) => {
             return requestInfo.id !== id
         })
     }
 
-    public isRequestId(id: string) {
+    private isRequestId(id: string) {
         return this.requestList.some ((requestInfo) => {
             return requestInfo.id === id
         })
