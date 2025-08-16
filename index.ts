@@ -38,7 +38,7 @@ interface requestInfo<T> {
     methodName: string
     serviceName: string
     dto?: T | undefined
-    state: Map<string, string>
+    state?: { [key: string]: string }
     type: requestType
     func?: (data: result<any>) => void
     on?: on<any>
@@ -84,7 +84,7 @@ export default class client {
                         const map = new Map<string, any> ();
                         this.formerCall && this.formerCall (request.serviceName, request.methodName, map);
                         request.type = requestType.closeType;
-                        request.state = map;
+                        request.state = Object.fromEntries(map);
                         this.worker?.postMessage (JSON.stringify (request));
                     }
                 })
@@ -163,7 +163,6 @@ export default class client {
                 methodName: methodName,
                 serviceName: serviceName,
                 type: on ? requestType.proxyType : requestType.funcType,
-                state,
             };
             if (on) {
                 requestInfo.on = on;
@@ -176,6 +175,7 @@ export default class client {
                 requestInfo.dto = dto;
             }
             this.formerCall && this.formerCall (serviceName, methodName, state);
+            requestInfo.state = Object.fromEntries(state)
             if (this.status !== status.close) {
                 this.worker?.postMessage (JSON.stringify (requestInfo));
             }
@@ -202,11 +202,11 @@ export default class client {
                         id,
                         methodName: methodName,
                         serviceName: serviceName,
-                        type: requestType.closeType,
-                        state,
+                        type: requestType.closeType
                     };
                     on.onClose();
                     this.formerCall && this.formerCall (serviceName, methodName, state);
+                    requestInfo.state = Object.fromEntries(state)
                     if (this.status !== status.close) {
                         this.worker?.postMessage (JSON.stringify (requestInfo));
                         this.requestList.push (requestInfo);
