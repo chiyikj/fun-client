@@ -14,7 +14,7 @@ export interface result<T> {
     code?: number  | null
     msg?: string  | null
     status: resultStatus
-    data?: T | null
+    data?: T
 }
 
 enum status {
