@@ -11,10 +11,10 @@ export enum resultStatus {
 
 export interface result<T> {
     id?: string
-    code?: number | undefined
-    msg?: string  | undefined
+    code?: number  | null
+    msg?: string  | null
     status: resultStatus
-    data?:  | undefined
+    data?: T | null
 }
 
 enum status {
