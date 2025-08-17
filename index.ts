@@ -10,11 +10,11 @@ export enum resultStatus {
 }
 
 export interface result<T> {
-    Id?: string
-    Code?: number | undefined
-    Msg?: string  | undefined
-    Status: resultStatus
-    Data?:  | undefined
+    id?: string
+    code?: number | undefined
+    msg?: string  | undefined
+    status: resultStatus
+    data?:  | undefined
 }
 
 enum status {
@@ -126,26 +126,26 @@ export default class client {
     }
 
     private getData(data: result<any>) {
-        const index = this.requestList.findIndex ((request) => request.id === data.Id)
+        const index = this.requestList.findIndex ((request) => request.id === data.id)
         const request: requestInfo<any> = this.requestList[index]
         if (request.type === requestType.funcType) {
             request.func && request.func (this.after(request.serviceName, request.methodName,data))
         } else {
-            if (data.Status === resultStatus.success) {
-                request.on?.onMessage (data.Data)
-            } else if (data.Status === resultStatus.closeError) {
+            if (data.status === resultStatus.success) {
+                request.on?.onMessage (data.data)
+            } else if (data.status === resultStatus.closeError) {
                 request.on?.onClose ()
             }
         }
-        (request.type === requestType.funcType || data.Status === resultStatus.closeError) && this.deleteRequest(request.id)
+        (request.type === requestType.funcType || data.status === resultStatus.closeError) && this.deleteRequest(request.id)
     }
 
     private networkError(serviceName: string ,methodName: string):result<any> {
-        return this.after(serviceName, methodName,{Status: resultStatus.networkError})
+        return this.after(serviceName, methodName,{status: resultStatus.networkError})
     }
 
     private timeoutError(serviceName: string ,methodName: string):result<any> {
-        return this.after(serviceName, methodName,{Status: resultStatus.timeoutError})
+        return this.after(serviceName, methodName,{status: resultStatus.timeoutError})
     }
 
     private after<T>(serviceName: string ,methodName: string, result: result<T>):result<T> {
