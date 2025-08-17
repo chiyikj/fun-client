@@ -39,6 +39,7 @@ interface requestInfo<T> {
     serviceName: string
     dto?: T | undefined
     state?: { [key: string]: string }
+    lang?: string
     type: requestType
     func?: (data: result<any>) => void
     on?: on<any>
@@ -68,6 +69,7 @@ export default class client {
     private afterCall: (( serviceName: string ,methodName: string,result: result<any>) => result<any>) | null = null;
     private openCall: (() => void)[] = [];
     private closeCall: (() => void)[] = [];
+    private land: string | null = null
 
     constructor(url: string) {
         this.worker = getWorker(url)
@@ -151,7 +153,9 @@ export default class client {
     private after<T>(serviceName: string ,methodName: string, result: result<T>):result<T> {
         return this.afterCall ? this.afterCall (serviceName, methodName, result) : result
     }
-
+    public SetLang(lang:string){
+        this.land = lang
+    }
     public async request<T>(serviceName: string, methodName: string, dto?: object | null): Promise<result<T>>;
     public async request<T>(serviceName: string, methodName: string, dto: object | null, on: on<T>): Promise<(() => void)>;
     public async request<T>(serviceName: string, methodName: string, dto: object | null = null, on?: on<T>): Promise<result<T> | (() => void)> {
@@ -164,6 +168,9 @@ export default class client {
                 serviceName: serviceName,
                 type: on ? requestType.proxyType : requestType.funcType,
             };
+            if (this.land) {
+                requestInfo.lang = this.land
+            }
             if (on) {
                 requestInfo.on = on;
             } else {
@@ -204,6 +211,9 @@ export default class client {
                         serviceName: serviceName,
                         type: requestType.closeType
                     };
+                    if (this.land) {
+                        requestInfo.lang = this.land
+                    }
                     on.onClose();
                     this.formerCall && this.formerCall (serviceName, methodName, state);
                     requestInfo.state = Object.fromEntries(state)
