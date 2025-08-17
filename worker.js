@@ -22,46 +22,36 @@ if (typeof SharedWorkerGlobalScope !== 'undefined' && self instanceof SharedWork
         clientList.push(port);
 
         // 监听消息
-        port.onmessage = function (e) {
-            const data = JSON.parse(e.data);
-            if (data.method === "close") {
-                const requestIdList = data.id.split(",");
-                requestIdList.forEach((requestId) => {
-                    const index = requestList.findIndex((request) => request.request.id === requestId);
-                    requestList.splice(index, 1);
-                });
-            } else {
-                requestList.push({
-                    request: data,
-                    port,
-                });
-            }
-            ws.send(JSON.stringify(data));
-        };
+        port.onmessage = handleMessage
 
         port.start();
     };
 } else {
     // 普通 Worker 版本
-    self.onmessage = function (e) {
-        const data = JSON.parse(e.data);
-        if (data.method === "close") {
-            requestList = requestList.filter ((requestInfo) => {
-                return requestInfo.request.id !== data.id;
-            })
-        } else {
-            requestList.push({
-                request: data
-            });
-        }
-        ws.send(JSON.stringify(data));
-    };
+    self.onmessage = handleMessage
     newWs();
 }
 
 function ping(ws) {
     const binaryData = new Uint8Array([0]);
     ws.send(binaryData.buffer);
+}
+
+function handleMessage(e) {
+    const data = JSON.parse(e.data)
+    if (data.type === 2) {
+        const index = requestList.findIndex((request) => request.request.id === data.id);
+        requestList.splice(index, 1);
+    } else {
+        const requestEntry = {
+            request: data
+        };
+        if (port) {
+            requestEntry.port = port;
+        }
+        requestList.push(requestEntry);
+    }
+    ws.send(JSON.stringify(data));
 }
 
 function newWs(port = null) {
@@ -95,10 +85,10 @@ function newWs(port = null) {
     ws.onmessage = function (evt) {
         if (typeof evt.data === 'string') {
             const data = JSON.parse(evt.data);
-            const index = requestList.findIndex((request) => request.request.id === data.Id);
+            const index = requestList.findIndex((request) => request.request.id === data.id);
             const request = requestList[index];
             if (request) {
-                if (request.type === 0 || data.Status === 3) {
+                if (request.type === 0 || data.status === 3) {
                     requestList.splice(index, 1);
                 }
                 if (port) {

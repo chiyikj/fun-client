@@ -12,7 +12,7 @@ export enum resultStatus {
 export interface result<T> {
     id: string
     code: number | null
-    msg: string  | null
+    msg: string | null
     status: resultStatus
     data: T
 }
