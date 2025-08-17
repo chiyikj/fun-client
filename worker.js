@@ -38,22 +38,18 @@ function ping(ws) {
 }
 
 function handleMessage(e) {
-    const data = JSON.parse(e.data)
-    if (data.type === 2) {
-        const index = requestList.findIndex((request) => request.request.id === data.id);
-        requestList.splice(index, 1);
+    const data = JSON.parse(e.data);
+    if (data.method === "close") {
+        requestList = requestList.filter ((requestInfo) => {
+            return requestInfo.request.id !== data.id;
+        })
     } else {
-        const requestEntry = {
+        requestList.push({
             request: data
-        };
-        if (port) {
-            requestEntry.port = port;
-        }
-        requestList.push(requestEntry);
+        });
     }
     ws.send(JSON.stringify(data));
 }
-
 function newWs(port = null) {
     ws = new WebSocket(url + "?id=" + id);
     let time = null;
