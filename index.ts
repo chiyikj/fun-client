@@ -11,10 +11,10 @@ export enum resultStatus {
 
 export interface result<T> {
     id?: string
-    code?: number  | null
-    msg?: string  | null
+    code: number | null
+    msg: string  | null
     status: resultStatus
-    data?: T
+    data: T
 }
 
 enum status {
@@ -141,11 +141,11 @@ export default class client {
     }
 
     private networkError(serviceName: string ,methodName: string):result<any> {
-        return this.after(serviceName, methodName,{status: resultStatus.networkError})
+        return this.after(serviceName, methodName,{status: resultStatus.networkError,data: null,msg: null,code: null})
     }
 
     private timeoutError(serviceName: string ,methodName: string):result<any> {
-        return this.after(serviceName, methodName,{status: resultStatus.timeoutError})
+        return this.after(serviceName, methodName,{status: resultStatus.timeoutError,data: null,msg: null,code: null})
     }
 
     private after<T>(serviceName: string ,methodName: string, result: result<T>):result<T> {
