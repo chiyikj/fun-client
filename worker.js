@@ -1,7 +1,3 @@
-const searchParams = new URLSearchParams(location.search);
-const url = searchParams.get('url');
-const id = searchParams.get('id');
-
 let ws = null;
 let clientList = [];
 let requestList = [];
@@ -12,12 +8,8 @@ if (typeof SharedWorkerGlobalScope !== 'undefined' && self instanceof SharedWork
     // SharedWorker 版本
     self.onconnect = function (e) {
         const port = e.ports[0];
-        if (!ws) {
-            newWs();
-        } else {
-            if (time1) {
-                port.postMessage(JSON.stringify({ type: 0 }));
-            }
+        if (ws &&time1){
+            port.postMessage(JSON.stringify({ type: 0 }));
         }
         clientList.push(port);
 
@@ -29,7 +21,6 @@ if (typeof SharedWorkerGlobalScope !== 'undefined' && self instanceof SharedWork
 } else {
     // 普通 Worker 版本
     self.onmessage = handleMessage()
-    newWs();
 }
 
 function ping(ws) {
@@ -40,7 +31,12 @@ function ping(ws) {
 function handleMessage(port) {
     return function (e) {
         const data = JSON.parse(e.data);
-        if (data.type === 2) {
+        if (data.type === 3) {
+            if (!ws) {
+                newWs(data.data,data.id);
+            }
+            return
+        }else if (data.type === 2) {
             requestList = requestList.filter ((requestInfo) => {
                 return requestInfo.request.id !== data.id;
             })
@@ -53,7 +49,7 @@ function handleMessage(port) {
         ws.send(JSON.stringify(data));
     };
 }
-function newWs() {
+function newWs(url, id) {
     ws = new WebSocket(url + "?id=" + id);
     let time = null;
 
@@ -118,10 +114,10 @@ function newWs() {
             }
             requestList.length = 0;
             clearInterval(time1);
-            newWs(); // 重新连接
+            newWs(url,id); // 重新连接
         } else {
             setTimeout(() => {
-                newWs(); // 重新连接
+                newWs(url,id); // 重新连接
             }, 5000);
         }
     };
