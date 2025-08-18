@@ -1,4 +1,5 @@
 import {nanoid} from "nanoid";
+import worker from "./worker.js?worker"
 
 export enum resultStatus {
     success,
@@ -247,7 +248,7 @@ export default class client {
 }
 
 const getWorker = (url: string):MessagePort | Worker => {
-    const workerUrl = new URL( './worker', import.meta.url);
+    const workerUrl = new URL(worker, import.meta.url);
     workerUrl.searchParams.set('id', getId());
     workerUrl.searchParams.set('url', url);
     if (typeof SharedWorker !== 'undefined') {
