@@ -1,8 +1,5 @@
 import {nanoid} from "nanoid";
-// @ts-ignore
-import WorkerFile from "./worker.js?worker";
-// @ts-ignore
-import SharedWorkerFile from "./worker.js?sharedworker";
+
 export enum resultStatus {
     success,
     callError,
@@ -50,8 +47,7 @@ interface requestInfo<T> {
 enum requestType {
     funcType,
     proxyType,
-    closeType,
-    initType
+    closeType
 }
 
 export class on<T> {
@@ -251,17 +247,13 @@ export default class client {
 }
 
 const getWorker = (url: string):MessagePort | Worker => {
+    const workerUrl = new URL( './worker', import.meta.url);
+    workerUrl.searchParams.set('id', getId());
+    workerUrl.searchParams.set('url', url);
     if (typeof SharedWorker !== 'undefined') {
-        // 使用 SharedWorker 构造函数创建
-        const sharedWorker = new SharedWorkerFile();
-        // 通过消息传递参数，而不是 URL 参数
-        sharedWorker.port.postMessage(JSON.stringify({ type: requestType.initType, id: getId(), data: url }));
-        return sharedWorker.port;
+        return  new SharedWorker(workerUrl).port;
     } else {
-        // 使用 Worker 构造函数创建
-        const worker = new WorkerFile();
-        worker.postMessage(JSON.stringify({ type: requestType.initType, id: getId(), data: url }));
-        return worker;
+        return  new Worker(workerUrl);
     }
 };
 
