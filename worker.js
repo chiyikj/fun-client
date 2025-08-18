@@ -13,7 +13,7 @@ if (typeof SharedWorkerGlobalScope !== 'undefined' && self instanceof SharedWork
     self.onconnect = function (e) {
         const port = e.ports[0];
         if (clientList.length === 0) {
-            newWs(port);
+            newWs();
         } else {
             if (time1) {
                 port.postMessage(JSON.stringify({ type: 0 }));
@@ -22,13 +22,13 @@ if (typeof SharedWorkerGlobalScope !== 'undefined' && self instanceof SharedWork
         clientList.push(port);
 
         // 监听消息
-        port.onmessage = handleMessage
+        port.onmessage = handleMessage(port)
 
         port.start();
     };
 } else {
     // 普通 Worker 版本
-    self.onmessage = handleMessage
+    self.onmessage = handleMessage()
     newWs();
 }
 
@@ -37,18 +37,21 @@ function ping(ws) {
     ws.send(binaryData.buffer);
 }
 
-function handleMessage(e) {
-    const data = JSON.parse(e.data);
-    if (data.method === "close") {
-        requestList = requestList.filter ((requestInfo) => {
-            return requestInfo.request.id !== data.id;
-        })
-    } else {
-        requestList.push({
-            request: data
-        });
-    }
-    ws.send(JSON.stringify(data));
+function handleMessage(port) {
+    return function (e) {
+        const data = JSON.parse(e.data);
+        if (data.type === 2) {
+            requestList = requestList.filter ((requestInfo) => {
+                return requestInfo.request.id !== data.id;
+            })
+        } else {
+            requestList.push({
+                request: data,
+                port:port
+            });
+        }
+        ws.send(JSON.stringify(data));
+    };
 }
 function newWs(port = null) {
     ws = new WebSocket(url + "?id=" + id);
@@ -84,11 +87,11 @@ function newWs(port = null) {
             const index = requestList.findIndex((request) => request.request.id === data.id);
             const request = requestList[index];
             if (request) {
-                if (request.type === 0 || data.status === 3) {
+                if (data.type === 0 || data.status === 3) {
                     requestList.splice(index, 1);
                 }
-                if (port) {
-                    port.postMessage(JSON.stringify({ type: 2, data: JSON.stringify(data) }));
+                if (request.port) {
+                    request.port.postMessage(JSON.stringify({ type: 2, data: JSON.stringify(data) }));
                 } else {
                     self.postMessage(JSON.stringify({ type: 2, data: JSON.stringify(data) }));
                 }
