@@ -87,7 +87,7 @@ function newWs() {
             const index = requestList.findIndex((request) => request.request.id === data.id);
             const request = requestList[index];
             if (request) {
-                if (data.type === 0 || data.status === 3) {
+                if (request.type === 0 || data.status === 3) {
                     requestList.splice(index, 1);
                 }
                 if (request.port) {
