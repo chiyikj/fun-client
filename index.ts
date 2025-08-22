@@ -54,7 +54,7 @@ export class on<T> {
 
     }
 
-    onClose(result?: result<T>): void {
+    onClose(): void {
 
     }
 }
