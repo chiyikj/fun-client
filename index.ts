@@ -187,8 +187,10 @@ export default class client {
                     }
                 }, timeout);
             };
-            handleTimeout(true, 2000);   // 网络错误
-            handleTimeout(false, 10000); // 超时错误
+            if (!on) {
+                handleTimeout(true, 2000);   // 网络错误
+                handleTimeout(false, 10000); // 超时错误
+            }
             if (on) {
                 resolve(() => {
                     const state = new Map<string, any> ();
