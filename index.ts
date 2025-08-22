@@ -132,11 +132,11 @@ export default class client {
         } else {
             if (data.status === resultStatus.success) {
                 request.on?.onMessage (data.data)
-            } else if (data.status === resultStatus.closeError) {
+            }  else  {
                 request.on?.onClose ()
             }
         }
-        (request.type === requestType.funcType || data.status === resultStatus.closeError) && this.deleteRequest(request.id)
+        (request.type === requestType.funcType || data.status !== resultStatus.success) && this.deleteRequest(request.id)
     }
 
     private networkError(serviceName: string ,methodName: string):result<any> {
@@ -182,11 +182,7 @@ export default class client {
                 setTimeout(() => {
                     const expectedStatus = isNetworkError ? status.close : status.susses;
                     if (this.status === expectedStatus && this.isRequestId(id)) {
-                        if (requestInfo.type === requestType.funcType) {
-                            resolve(isNetworkError ? this.networkError(serviceName, methodName) : this.timeoutError(serviceName, methodName));
-                        } else {
-                            requestInfo.on?.onClose(isNetworkError ? this.networkError(serviceName, methodName) : this.timeoutError(serviceName, methodName));
-                        }
+                        resolve(isNetworkError ? this.networkError(serviceName, methodName) : this.timeoutError(serviceName, methodName));
                         this.deleteRequest(id);
                     }
                 }, timeout);
